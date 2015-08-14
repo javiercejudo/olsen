@@ -32,4 +32,4 @@ olsen(NaN, NaN)(function(x) {
 }); // => false, NaN !== NaN
 ```
 
-See [use case](test/useCase.js).
+See [use case](fixtures/Address.js) and [accompanying tests](test/useCase.js).
