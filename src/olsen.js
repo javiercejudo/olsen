@@ -19,6 +19,6 @@ module.exports = function olsen(a, b) {
    * @return {Boolean}
    */
   return function check(kind) {
-    return kind.call(a, a) === kind.call(b, b);
+    return kind(a) === kind(b);
   };
 };

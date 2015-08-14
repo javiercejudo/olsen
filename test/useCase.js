@@ -6,8 +6,16 @@ require('should');
 
 var ofAKind = require('../src/olsen');
 
+function wrapProtoFuncs(protoFunc) {
+  return function(x) {
+    return protoFunc.call(x);
+  }
+}
+
 describe('use case', function() {
   it('even kind of has a cool use case', function() {
+    var physicalPostcodeProps, physicalAddressProps, equalsProps;
+
     function Address(resident, number, street, postcode, country) {
       this.resident = resident;
       this.number = number;
@@ -36,34 +44,52 @@ describe('use case', function() {
       return this.country;
     };
 
-    Address.prototype.samePostcode = function(anotherAddress) {
-      return [
-        Address.prototype.getPostcode,
-        Address.prototype.getCountry
-      ].every(ofAKind(this, anotherAddress));
+    physicalPostcodeProps = [
+      Address.prototype.getPostcode,
+      Address.prototype.getCountry
+    ].map(wrapProtoFuncs);
+
+    physicalAddressProps = physicalPostcodeProps.concat([
+      Address.prototype.getNumber,
+      Address.prototype.getStreet
+    ].map(wrapProtoFuncs));
+
+    equalsProps = physicalAddressProps.concat([
+      Address.prototype.getResident
+    ].map(wrapProtoFuncs));
+
+    Address.prototype.samePhysicalPostcode = function(anotherAddress) {
+      return physicalPostcodeProps.every(ofAKind(anotherAddress, this));
     };
 
-    Address.prototype.sameAddress = function(anotherAddress) {
-      return [
-        Address.prototype.getNumber,
-        Address.prototype.getStreet,
-        Address.prototype.getPostcode,
-        Address.prototype.getCountry
-      ].every(ofAKind(this, anotherAddress));
+    Address.prototype.samePhysicalAddress = function(anotherAddress) {
+      return physicalAddressProps.every(ofAKind(anotherAddress, this));
+    };
+
+    Address.prototype.equals = function(anotherAddress) {
+      return equalsProps.every(ofAKind(anotherAddress, this));
     };
 
     var address1 = new Address('Javier', '100', 'George', '2000', 'Australia');
     var address2 = new Address('Jenna', '100', 'George', '2000', 'Australia');
     var address3 = new Address('Anna', '105', 'George', '2000', 'Australia');
     var address4 = new Address('Javier', '32', 'Gran Via', '2000', 'Spain');
+    var address5 = new Address('Javier', '100', 'George', '2000', 'Australia');
 
-    address1.samePostcode(address2).should.be.true;
-    address1.sameAddress(address2).should.be.true;
+    address1.samePhysicalPostcode(address2).should.be.true;
+    address1.samePhysicalAddress(address2).should.be.true;
+    address1.equals(address2).should.be.false;
 
-    address1.samePostcode(address3).should.be.true;
-    address1.sameAddress(address3).should.be.false;
+    address1.samePhysicalPostcode(address3).should.be.true;
+    address1.samePhysicalAddress(address3).should.be.false;
+    address1.equals(address3).should.be.false;
 
-    address1.samePostcode(address4).should.be.false;
-    address1.sameAddress(address4).should.be.false;
+    address1.samePhysicalPostcode(address4).should.be.false;
+    address1.samePhysicalAddress(address4).should.be.false;
+    address1.equals(address4).should.be.false;
+
+    address1.samePhysicalPostcode(address5).should.be.true;
+    address1.samePhysicalAddress(address5).should.be.true;
+    address1.equals(address5).should.be.true;
   });
 });
