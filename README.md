@@ -12,7 +12,7 @@ Two of a kind check
 
 ## Usage
 
-In general, `olsen(x, y)(func) <=> func(x) === func(y)`.
+In general, `olsen(x, y)(func)` ≡ `func(x) === func(y)`.
 
 ```js
 var olsen = require('olsen');
