@@ -6,9 +6,17 @@ var ofAKind = require('../src/olsen');
 
 var physicalPostcodeProps, physicalAddressProps, equalsProps;
 
-function wrapProtoFuncs(protoFunc) {
+function wrapProtoFunc(protoFunc) {
   return function(x) {
-    return protoFunc.call(x);
+    var len = arguments.length;
+    var argIndex;
+    var additionalArgs = [];
+
+    for (argIndex = 1; argIndex < len; len += 1) {
+      additionalArgs[argIndex - 1] = arguments[argIndex];
+    }
+
+    return protoFunc.apply(x, additionalArgs);
   };
 }
 
@@ -43,16 +51,16 @@ Address.prototype.getCountry = function() {
 physicalPostcodeProps = [
   Address.prototype.getPostcode,
   Address.prototype.getCountry
-].map(wrapProtoFuncs);
+].map(wrapProtoFunc);
 
 physicalAddressProps = physicalPostcodeProps.concat([
   Address.prototype.getNumber,
   Address.prototype.getStreet
-].map(wrapProtoFuncs));
+].map(wrapProtoFunc));
 
 equalsProps = physicalAddressProps.concat([
   Address.prototype.getResident
-].map(wrapProtoFuncs));
+].map(wrapProtoFunc));
 
 Address.prototype.samePhysicalPostcode = function(anotherAddress) {
   return physicalPostcodeProps.every(ofAKind(anotherAddress, this));
