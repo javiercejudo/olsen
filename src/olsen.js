@@ -8,7 +8,7 @@
  * @param {*} a
  * @param {*} b
  *
- * @return {Function} [description]
+ * @return {Function}
  */
 module.exports = function olsen(a, b) {
   /**
