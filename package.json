@@ -1,6 +1,6 @@
 {
   "name": "olsen",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Two of a kind check",
   "main": "src/olsen.js",
   "scripts": {
