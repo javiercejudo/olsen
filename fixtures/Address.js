@@ -3,22 +3,7 @@
 'use strict';
 
 var ofAKind = require('../src/olsen');
-
 var physicalPostcodeProps, physicalAddressProps, equalsProps;
-
-function wrapProtoFunc(protoFunc) {
-  return function(x) {
-    var len = arguments.length;
-    var argIndex;
-    var additionalArgs = [];
-
-    for (argIndex = 1; argIndex < len; len += 1) {
-      additionalArgs[argIndex - 1] = arguments[argIndex];
-    }
-
-    return protoFunc.apply(x, additionalArgs);
-  };
-}
 
 function Address(resident, number, street, postcode, country) {
   this.resident = resident;
@@ -51,27 +36,31 @@ Address.prototype.getCountry = function() {
 physicalPostcodeProps = [
   Address.prototype.getPostcode,
   Address.prototype.getCountry
-].map(wrapProtoFunc);
+];
 
 physicalAddressProps = physicalPostcodeProps.concat([
   Address.prototype.getNumber,
   Address.prototype.getStreet
-].map(wrapProtoFunc));
+]);
 
-equalsProps = physicalAddressProps.concat([
-  Address.prototype.getResident
-].map(wrapProtoFunc));
+equalsProps = physicalAddressProps.concat([Address.prototype.getResident]);
 
 Address.prototype.samePhysicalPostcode = function(anotherAddress) {
-  return physicalPostcodeProps.every(ofAKind(anotherAddress, this));
+  return physicalPostcodeProps
+    .map(f => f.bind(this))
+    .every(ofAKind(anotherAddress, this));
 };
 
 Address.prototype.samePhysicalAddress = function(anotherAddress) {
-  return physicalAddressProps.every(ofAKind(anotherAddress, this));
+  return physicalAddressProps
+    .map(f => f.bind(this))
+    .every(ofAKind(anotherAddress, this));
 };
 
 Address.prototype.equals = function(anotherAddress) {
-  return equalsProps.every(ofAKind(anotherAddress, this));
+  return equalsProps
+    .map(f => f.bind(this))
+    .every(ofAKind(anotherAddress, this));
 };
 
 module.exports = Address;

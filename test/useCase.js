@@ -7,7 +7,7 @@ require('should');
 var Address = require('../fixtures/Address');
 
 describe('use case', function() {
-  it('even kind of has a cool use case', function() {
+  it('simpler equality checks (see /fixtures/Address.js)', function() {
     var address1 = new Address('Javier', '100', 'George', '2000', 'Australia');
     var address2 = new Address('Jenna', '100', 'George', '2000', 'Australia');
     var address3 = new Address('Anna', '105', 'George', '2000', 'Australia');
